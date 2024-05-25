@@ -1,11 +1,11 @@
 import 'dart:developer';
-import 'package:note_app/Views/main_screen.dart';
-
-import '../../JsonModels/note_model.dart';
 import '../../SQLite/sqlite.dart';
 import '../../Custom/constant.dart';
 import 'package:flutter/material.dart';
+import '../../JsonModels/note_model.dart';
 import '../../widgets/custom_button.dart';
+import 'package:note_app/Views/main_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first, use_super_parameters, must_be_immutable
 
@@ -35,6 +35,12 @@ class _DetailSState extends State<DetailSCreen> {
 
   Future<List<NoteModel>> getAllNotes() async {
     return await helper.fetchData();
+  }
+
+  Future<bool> remove() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    sp.remove('user_id');
+    return true;
   }
 
   Future<void> refresh() async {

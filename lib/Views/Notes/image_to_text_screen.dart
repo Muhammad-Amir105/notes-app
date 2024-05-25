@@ -1,20 +1,22 @@
 import 'dart:io';
+import '../../SQLite/sqlite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:note_app/widgets/custom_button.dart';
-
 import '../../JsonModels/note_model.dart';
-import '../../SQLite/sqlite.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../widgets/image_picker_dialog.dart';
+import 'package:note_app/widgets/custom_button.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+// ignore_for_file: must_be_immutable
+
 // ignore_for_file: use_build_context_synchronously
 
 // ignore_for_file: library_private_types_in_public_api
 
 class ImageToTextNotesScreen extends StatefulWidget {
-  const ImageToTextNotesScreen({super.key});
+  dynamic id;
+  ImageToTextNotesScreen({super.key, this.id});
 
   @override
   _ImageToTextNotesScreenState createState() => _ImageToTextNotesScreenState();
@@ -53,9 +55,9 @@ class _ImageToTextNotesScreenState extends State<ImageToTextNotesScreen> {
     setState(() {
       text = recognizedText.text;
       Future.delayed(const Duration(milliseconds: 500), () {
-     setState(() {
+        setState(() {
           value = true;
-     });
+        });
       });
     });
 
@@ -153,6 +155,7 @@ class _ImageToTextNotesScreenState extends State<ImageToTextNotesScreen> {
 
                             helper
                                 .createNote(NoteModel(
+                                    noteId: widget.id,
                                     noteTitle: title,
                                     noteContent: content,
                                     createdAt:

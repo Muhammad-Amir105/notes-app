@@ -1,15 +1,17 @@
-// ignore_for_file: unused_field
-
-import 'package:flutter/cupertino.dart';
+import '../../SQLite/sqlite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:note_app/widgets/custom_button.dart';
-import 'package:speech_to_text/speech_to_text.dart';
+import 'package:flutter/cupertino.dart';
 import '../../JsonModels/note_model.dart';
-import '../../SQLite/sqlite.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:note_app/widgets/custom_button.dart';
+// ignore_for_file: must_be_immutable
+
+// ignore_for_file: unused_field
 
 class SpeechToTextScreen extends StatefulWidget {
-  const SpeechToTextScreen({super.key});
+  dynamic id;
+  SpeechToTextScreen({super.key, this.id});
 
   @override
   State<SpeechToTextScreen> createState() => _SpeechToTextScreenState();
@@ -66,7 +68,7 @@ class _SpeechToTextScreenState extends State<SpeechToTextScreen> {
             color: Colors.black,
           ),
         ),
-         actions: [
+        actions: [
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: CupertinoButton(
@@ -80,11 +82,11 @@ class _SpeechToTextScreenState extends State<SpeechToTextScreen> {
                 }),
           )
         ],
-         leading: InkWell(
-                onTap: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: const Icon(Icons.arrow_back)),
+        leading: InkWell(
+            onTap: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Icon(Icons.arrow_back)),
       ),
       body: Center(
         child: Column(
@@ -132,6 +134,7 @@ class _SpeechToTextScreenState extends State<SpeechToTextScreen> {
 
                       helper
                           .createNote(NoteModel(
+                              noteId: widget.id,
                               noteTitle: title,
                               noteContent: content,
                               createdAt: DateTime.now().toIso8601String()))

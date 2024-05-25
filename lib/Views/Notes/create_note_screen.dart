@@ -1,11 +1,14 @@
+import 'dart:developer';
 import '../../Custom/constant.dart';
 import 'package:flutter/material.dart';
 import '../../JsonModels/note_model.dart';
 import 'package:note_app/SQLite/sqlite.dart';
 import 'package:note_app/widgets/custom_button.dart';
+// ignore_for_file: must_be_immutable
 
 class CreateNote extends StatefulWidget {
-  const CreateNote({super.key});
+  dynamic id;
+  CreateNote({super.key, this.id});
 
   @override
   State<CreateNote> createState() => _CreateNoteState();
@@ -17,7 +20,6 @@ class _CreateNoteState extends State<CreateNote> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   late DatabaseHelper helper;
-
 
   @override
   void initState() {
@@ -36,14 +38,15 @@ class _CreateNoteState extends State<CreateNote> {
 
   @override
   Widget build(BuildContext context) {
+    log("id in note:${widget.id}");
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create note"),
-       leading: InkWell(
-        onTap: () {
-          Navigator.of(context).pop(true);
-        },
-        child: const Icon(Icons.arrow_back)),
+        leading: InkWell(
+            onTap: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -134,6 +137,7 @@ class _CreateNoteState extends State<CreateNote> {
                           content.clear();
                           helper
                               .createNote(NoteModel(
+                                  noteId: widget.id,
                                   noteTitle: title1,
                                   noteContent: content1,
                                   createdAt: DateTime.now().toIso8601String()))

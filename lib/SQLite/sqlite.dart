@@ -10,7 +10,7 @@ class DatabaseHelper {
   static String tableName = "notes_tb";
   static String usersTableName = "users_tb";
   String noteTable =
-      "CREATE TABLE $tableName(noteId INTEGER PRIMARY KEY AUTOINCREMENT, noteTitle TEXT NOT NULL, noteContent TEXT NOT NULL, createdAt TEXT DEFAULT CURRENT_TIMESTAMP)";
+      "CREATE TABLE $tableName(noteId INTEGER, noteTitle TEXT NOT NULL, noteContent TEXT NOT NULL, createdAt TEXT DEFAULT CURRENT_TIMESTAMP)";
   String dropTableNotes = 'DROP TABLE IF EXISTS $tableName';
 
   String usersTable =
@@ -38,8 +38,6 @@ class DatabaseHelper {
     }
     return Future.value(database);
   }
-
-
 
   // Login user
   Future<bool> loginUser(Users user) async {
@@ -96,7 +94,6 @@ class DatabaseHelper {
     return searchResult.map((e) => NoteModel.fromMap(e)).toList();
   }
 
- 
 // create notes method
   Future<bool> createNote(NoteModel note) async {
     try {
@@ -117,8 +114,6 @@ class DatabaseHelper {
     }
   }
 
- 
-
   // Get notes
   Future<List<NoteModel>> fetchData() async {
     Database? database = await notesDB();
@@ -126,7 +121,6 @@ class DatabaseHelper {
     return list.map((map) => NoteModel.fromMap(map)).toList();
   }
 
- 
   // delete one note from database
   Future<bool> daleteOneDataItem(int id) async {
     try {
@@ -143,8 +137,6 @@ class DatabaseHelper {
       return false;
     }
   }
-
-
 
   // delete all table
   Future<bool> daleteAllData() async {
@@ -177,6 +169,4 @@ class DatabaseHelper {
   //       'update ${TaskModel.tasktableName} set taskTitle = ?, where taskId = ?',
   //       [task, taskId]);
   // }
-
- 
 }

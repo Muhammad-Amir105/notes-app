@@ -1,14 +1,14 @@
 import 'dart:developer';
-
+import 'speech_to_text.dart';
 import 'package:intl/intl.dart';
 import 'create_note_screen.dart';
+import 'image_to_text_screen.dart';
+import '../../JsonModels/user.dart';
 import 'package:flutter/material.dart';
 import '../../JsonModels/note_model.dart';
 import 'package:note_app/SQLite/sqlite.dart';
 import 'package:note_app/Views/Notes/detail_screen.dart';
-
-import 'image_to_text_screen.dart';
-import 'speech_to_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -25,7 +25,7 @@ class NotesScreen extends StatefulWidget {
 class _NotesScreenState extends State<NotesScreen> {
   late DatabaseHelper helper;
   late Future<List<NoteModel>> notes;
-
+  Users? user;
   late TextEditingController title;
   late TextEditingController content;
   late TextEditingController search;
@@ -38,14 +38,37 @@ class _NotesScreenState extends State<NotesScreen> {
     search = TextEditingController();
     helper = DatabaseHelper();
     notes = helper.fetchData();
-  dynamic  getuser=helper.getUser(widget.username);
+
+    _fetchUserData().whenComplete(
+      () {
+        saveUser();
+      },
+    );
     helper.notesDB().whenComplete(() {
       notes = getAllNotes();
-    
     });
+  }
 
-    log("getUser: $getuser"); 
+  Future<void> _fetchUserData() async {
+    try {
+      dynamic fetchedUser = await helper.getUser(widget.username);
+      if (mounted) {
+        setState(() {
+          user = fetchedUser;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
 
+  Future<bool> saveUser() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    sp.setString('user_id', user!.usrId.toString());
+    sp.setString('user_email', user!.usrEmail.toString());
+    return true;
   }
 
   Future<List<NoteModel>> getAllNotes() async {
@@ -64,6 +87,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log("user:${widget.username.toString()}");
     return Scaffold(
       body: Column(
         children: [
@@ -100,16 +124,27 @@ class _NotesScreenState extends State<NotesScreen> {
                 future: notes,
                 builder: (context, AsyncSnapshot<List<NoteModel>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No Notes Avaible"));
+                    return const Center(child: Text("No Notes Available"));
                   } else if (snapshot.hasError) {
                     return Center(child: Text(snapshot.error.toString()));
                   } else {
                     final items = snapshot.data ?? <NoteModel>[];
+                    final userId = user?.usrId;
+
+                    final filteredItems =
+                        items.where((note) => note.noteId == userId).toList();
+
+                    if (filteredItems.isEmpty) {
+                      return const Center(
+                          child: Text("No Notes Available for this user"));
+                    }
+
                     return ListView.builder(
-                      itemCount: items.length,
+                      itemCount: filteredItems.length,
                       itemBuilder: (context, index) {
+                        log("notes Id:${filteredItems[index].noteId}");
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Card(
@@ -121,18 +156,20 @@ class _NotesScreenState extends State<NotesScreen> {
                                 size: 30,
                               ),
                               title: Text(
-                                items[index].noteTitle.toString(),
+                                filteredItems[index].noteTitle.toString(),
                               ),
                               subtitle: Text(DateFormat("yMd").format(
-                                  DateTime.parse(items[index].createdAt))),
+                                  DateTime.parse(
+                                      filteredItems[index].createdAt))),
                               onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => DetailSCreen(
-                                        title: items[index].noteTitle,
-                                        content: items[index].noteContent,
-                                        contentId: items[index].noteId!,
+                                        title: filteredItems[index].noteTitle,
+                                        content:
+                                            filteredItems[index].noteContent,
+                                        contentId: filteredItems[index].noteId!,
                                         userName: widget.username,
                                       ),
                                     )).whenComplete(() {
@@ -166,7 +203,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
-                    height: MediaQuery.of(context).size.height * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.6,
                     child: AlertDialog(
                       title: const Center(
                         child: Text(
@@ -192,8 +229,9 @@ class _NotesScreenState extends State<NotesScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CreateNote())).then((value) {
+                                      builder: (context) => CreateNote(
+                                            id: user!.usrId,
+                                          ))).then((value) {
                                 if (value) {
                                   refresh();
                                   Navigator.of(context).pop();
@@ -218,11 +256,11 @@ class _NotesScreenState extends State<NotesScreen> {
                                 child: Text('Add Notes With Voice')),
                             onPressed: () async {
                               Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SpeechToTextScreen()))
-                                  .then((value) {
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SpeechToTextScreen(
+                                            id: user!.usrId,
+                                          ))).then((value) {
                                 if (value) {
                                   refresh();
                                   Navigator.of(context).pop();
@@ -247,11 +285,12 @@ class _NotesScreenState extends State<NotesScreen> {
                                 child: Text('Add Notes With Image To Text')),
                             onPressed: () async {
                               Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ImageToTextNotesScreen()))
-                                  .then((value) {
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ImageToTextNotesScreen(
+                                            id: user!.usrId,
+                                          ))).then((value) {
                                 if (value) {
                                   refresh();
                                   Navigator.of(context).pop();
