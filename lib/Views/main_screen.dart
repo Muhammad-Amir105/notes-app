@@ -1,18 +1,15 @@
-// ignore_for_file: use_build_context_synchronously, must_be_immutable
-
 import 'dart:developer';
-
+import 'Auth/user_profile.dart';
+import '../JsonModels/user.dart';
 import 'package:flutter/material.dart';
 import 'package:note_app/SQLite/sqlite.dart';
 import 'package:note_app/Views/Notes/notes.dart';
 import 'package:note_app/Views/ToDo/todo_main_screen.dart';
-
-import '../JsonModels/user.dart';
-import 'Auth/user_profile.dart';
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
 
 class MainScreen extends StatefulWidget {
   String userName;
-   MainScreen({super.key,required this.userName});
+  MainScreen({super.key, required this.userName});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -154,9 +151,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       });
                     },
                     controller: _pageController,
-                    children:  [
-                      NotesScreen(username: widget.userName.toString() ,),
-                      const ToDoMainScreen(),
+                    children: [
+                      NotesScreen(
+                        username: widget.userName.toString(),
+                      ),
+                      ToDoMainScreen(
+                        userName: widget.userName.toString(),
+                      ),
                     ]),
               )
             ],

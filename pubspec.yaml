@@ -47,6 +47,7 @@ dependencies:
   image_picker: ^1.0.0
   speech_to_text: ^6.3.0
   shared_preferences:
+  flutter_alarm_clock: ^0.1.1
   # flutter_local_notifications: ^5.0.0
 
 dev_dependencies:

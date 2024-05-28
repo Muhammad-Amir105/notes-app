@@ -11,7 +11,7 @@ class TaskModel {
   static const String key_createAt = 'createdAt';
 
   static const String taskTableCreate =
-      "CREATE TABLE $tasktableName($key_taskId INTEGER PRIMARY KEY AUTOINCREMENT, $key_taskTitle TEXT, $key_createAt TEXT DEFAULT CURRENT_TIMESTAMP)";
+      "CREATE TABLE $tasktableName($key_taskId INTEGER, $key_taskTitle TEXT, $key_createAt TEXT DEFAULT CURRENT_TIMESTAMP)";
   static const String dropTabletask = 'DROP TABLE IF EXISTS $tasktableName';
   static const String fetch_task = 'SELECT * FROM $tasktableName';
 

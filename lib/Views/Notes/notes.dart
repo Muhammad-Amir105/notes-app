@@ -67,6 +67,7 @@ class _NotesScreenState extends State<NotesScreen> {
   Future<bool> saveUser() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setString('user_id', user!.usrId.toString());
+    sp.setInt("used_ID", user!.usrId!.toInt());
     sp.setString('user_email', user!.usrEmail.toString());
     return true;
   }
